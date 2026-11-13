@@ -1,0 +1,25 @@
+# 開発用メモ（公開しない）
+CLAUDE.md
+docs/DESIGN.md
+docs/PROGRESS.md
+
+# OS
+.DS_Store
+Thumbs.db
+
+# エディタ
+.vscode/
+.idea/
+*.swp
+
+# 依存関係・ビルド成果物
+node_modules/
+dist/
+build/
+__pycache__/
+*.pyc
+
+# ログ・環境変数
+*.log
+.env
+.env.*
