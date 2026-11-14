@@ -17,6 +17,11 @@ test('bashMaxLines は 0 以上の整数を受け付ける', async () => {
   expect(parseConfig({ bashMaxLines: '5' }).bashMaxLines).toBe(5)
 })
 
+test('groupDetails は真偽値だけを受け付ける', async () => {
+  expect(parseConfig({ groupDetails: false }).groupDetails).toBe(false)
+  expect(parseConfig({ groupDetails: 'no' }).groupDetails).toBe(DEFAULT_CONFIG.groupDetails)
+})
+
 test('不正な bashMaxLines は既定値に戻る', async () => {
   for (const bashMaxLines of [-1, 2.5, 'many', '', 1_000_000]) {
     expect(parseConfig({ bashMaxLines }).bashMaxLines).toBe(DEFAULT_CONFIG.bashMaxLines)

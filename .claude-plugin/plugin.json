@@ -17,6 +17,12 @@
       "title": "Bash max lines",
       "description": "Bash output longer than this many lines is folded into one line.",
       "default": 3
+    },
+    "groupDetails": {
+      "type": "boolean",
+      "title": "Group details",
+      "description": "Under grouped tool rows (\"Ran 3 shell commands\"), show each Bash command's summary and the files read.",
+      "default": true
     }
   }
 }
