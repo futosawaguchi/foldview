@@ -49,7 +49,8 @@ export const captureRun = (input: CaptureInput): BashRun => {
 
   return {
     id: input.id,
-    command: input.command,
+    // 画面に出す文字なので、出力と同じく制御文字を取り除く
+    command: stripAnsi(input.command),
     promptId: input.promptId,
     lineCount: all.length,
     lastLine: lastLineOf(lines),
@@ -65,7 +66,7 @@ export const currentPromptId = (history: BashHistory): number => history.prompts
 
 /** プロンプトを1つ足す。控えは最初の行だけを短くして持つ */
 export const addPrompt = (history: BashHistory, text: string): BashHistory => {
-  const firstLine = text.trim().split(/\r?\n/, 1)[0] ?? ''
+  const firstLine = stripAnsi(text.trim().split(/\r?\n/, 1)[0] ?? '')
   const mark: PromptMark = { id: currentPromptId(history) + 1, text: firstLine.slice(0, MAX_PROMPT_CHARS) }
 
   return pruneUnusedPrompts({ ...history, prompts: [...history.prompts, mark] })

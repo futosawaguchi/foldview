@@ -70,3 +70,11 @@ test('groupByPrompt は新しいプロンプトから、新しい順にまとめ
   expect(groups.map(group => group.prompt)).toEqual(['second', 'first'])
   expect(groups.map(group => group.runs.map(one => one.id))).toEqual([['c'], ['b', 'a']])
 })
+
+test('コマンドとプロンプトの制御文字は取り除く', async () => {
+  const captured = captureRun({ id: 'x', command: 'echo \u001b[31mred\u001b[0m\u0007', promptId: 1, output: { stdout: '' } })
+  const history = addPrompt(EMPTY_HISTORY, '\u001b]0;title\u0007hello')
+
+  expect(captured.command).toBe('echo red')
+  expect(history.prompts[0]?.text).toBe('hello')
+})
