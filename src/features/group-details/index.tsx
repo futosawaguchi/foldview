@@ -4,9 +4,9 @@ import { atom, read } from 'claude-code'
 import type { On } from 'claude-code'
 
 import type { Config } from '../../config'
-import { stripAnsi, truncateToWidth } from '../../shared/text'
+import { stripAnsi } from '../../shared/text'
 import { DEFAULT_OVERRIDE, ENABLED_OVERRIDE_SHAPE, isFoldingEnabled } from '../../state'
-import { buildGroupDetails } from './summary'
+import { buildGroupDetails, formatDetailLine } from './summary'
 
 const enabledOverrideAtom = atom(
   { plugin: 'foldview', key: 'enabledOverride' } as const,
@@ -39,7 +39,7 @@ export const registerGroupDetails = (on: On, config: Config): void => {
           <Box key={`detail-${index}`}>
             <Text dimColor>{GUTTER}</Text>
             {/* 部品ごとにも掃除しているが、画面に出す直前にもう一度制御文字を取り除く */}
-            <Text dimColor>{truncateToWidth(stripAnsi(line), width)}</Text>
+            <Text dimColor>{stripAnsi(formatDetailLine(line, width))}</Text>
           </Box>
         ))}
       </Box>

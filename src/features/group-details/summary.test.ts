@@ -1,7 +1,10 @@
 import { expect, test } from 'claude-code/testing'
 
-import { buildGroupDetails, describeBashCall, describeLookups } from './summary'
+import { buildGroupDetails, describeBashCall, describeLookups, formatDetailLine } from './summary'
 import type { GroupCall } from './summary'
+
+// 幅を気にしないときの1行の文字
+const plain = (calls: readonly GroupCall[]) => buildGroupDetails(calls).map(line => formatDetailLine(line, 200))
 
 const bash = (command: string, stdout: string, isRunning = false): GroupCall => ({
   tool: 'Bash',
@@ -11,13 +14,13 @@ const bash = (command: string, stdout: string, isRunning = false): GroupCall => 
 })
 
 test('Bash は「コマンド · 行数 · 最後の行」になる', async () => {
-  expect(describeBashCall(bash('npm test', 'a\nb\nTests: 12 passed\n'))).toBe('npm test · 3 lines · Tests: 12 passed')
-  expect(describeBashCall(bash('true', ''))).toBe('true · no output')
-  expect(describeBashCall(bash('sleep 5', '', true))).toBe('sleep 5 · running…')
+  expect(plain([bash('npm test', 'a\nb\nTests: 12 passed\n')])).toEqual(['npm test · 3 lines · Tests: 12 passed'])
+  expect(plain([bash('true', '')])).toEqual(['true · no output'])
+  expect(plain([bash('sleep 5', '', true)])).toEqual(['sleep 5 · running…'])
 })
 
 test('複数行のコマンドは最初の行だけを出す', async () => {
-  expect(describeBashCall(bash("python3 - <<'EOF'\nprint(1)\nEOF", '1\n'))).toBe("python3 - <<'EOF' · 1 line · 1")
+  expect(describeBashCall(bash("python3 - <<'EOF'\nprint(1)\nEOF", '1\n'))).toEqual({ text: "python3 - <<'EOF'", summary: '1 line · 1' })
 })
 
 test('Read はファイル名、Grep と Glob はパターンを並べる', async () => {
@@ -42,7 +45,7 @@ test('名前が多いときは +N で省き、同じ名前は1回だけ出す', 
 test('Bash は最後の3件を実行順に出し、それより前は +N more にする', async () => {
   const calls = ['one', 'two', 'three', 'four', 'five'].map(name => bash(name, `${name}\n`))
 
-  expect(buildGroupDetails(calls)).toEqual([
+  expect(plain(calls)).toEqual([
     '+2 more',
     'three · 1 line · three',
     'four · 1 line · four',
@@ -53,7 +56,17 @@ test('Bash は最後の3件を実行順に出し、それより前は +N more �
 test('名前の行が先、Bash の行があと', async () => {
   const calls: GroupCall[] = [bash('ls', 'x\n'), { tool: 'Read', input: { file_path: '/r/README.md' }, isRunning: false }]
 
-  expect(buildGroupDetails(calls)).toEqual(['README.md', 'ls · 1 line · x'])
+  expect(plain(calls)).toEqual(['README.md', 'ls · 1 line · x'])
+})
+
+test('長いコマンドは幅の半分（最大40）で切り、結果を見せる', async () => {
+  const long = bash('claude plugin test . 2>&1 | grep -E "^\\(fail\\)|Error|Received|Expected" | head -20', 'x\nRan 44 tests\n')
+
+  expect(formatDetailLine(describeBashCall(long), 100)).toBe(
+    'claude plugin test . 2>&1 | grep -E "^\\… · 2 lines · Ran 44 tests',
+  )
+  // 狭いときは幅の半分まで
+  expect(formatDetailLine(describeBashCall(long), 40)).toBe('claude plugin test … · 2 lines · Ran 44…')
 })
 
 test('ファイル名の制御文字は取り除く', async () => {
