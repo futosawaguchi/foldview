@@ -18,10 +18,25 @@ const BACK_KEY = 'back'
 /** 一覧でコマンドに使う幅の上限。残りを「行数 · 最後の行」に使う */
 const COMMAND_COLUMNS = 32
 
+/** パネルの下に出す操作の案内 */
+const LIST_HINT = '↑↓ / Tab: move · Enter: open · Esc: close'
+const DETAIL_HINT = 'Enter: back to the list · Esc: close'
+
 // 別ファイルから $ を受け取る関数は function 宣言で書く（エンジンの決まり）
 export async function openBashPane($: EngineInterface): Promise<void> {
   await update($, paneViewAtom, () => LIST_VIEW)
   await $.ui.open({ id: PANE_ID, title: PANE_TITLE, focus: true, closeOnEscape: true })
+}
+
+/** 開いて見えていれば閉じ、そうでなければ開く（ほかのパネルの裏にあるときは前に出す） */
+export async function toggleBashPane($: EngineInterface): Promise<void> {
+  const pane = (await $.ui.panes()).find(one => one.id === PANE_ID)
+
+  if (pane?.isShown === true) {
+    await $.ui.close({ id: PANE_ID })
+  } else {
+    await openBashPane($)
+  }
 }
 
 const firstLine = (text: string): string => text.split(/\r?\n/, 1)[0] ?? ''
@@ -68,6 +83,7 @@ export const registerBashPane = (on: On): void => {
             <Text> </Text>
             <Text dimColor>{truncateToWidth(header, Math.max(10, width - 12))}</Text>
           </Box>
+          <Text dimColor>{truncateToWidth(DETAIL_HINT, width)}</Text>
           <Text> </Text>
           {detailRun.lines.length === 0 ? (
             <Text dimColor>(no output)</Text>
@@ -83,7 +99,13 @@ export const registerBashPane = (on: On): void => {
 
     const groups = groupByPrompt(history)
     if (groups.length === 0) {
-      return <Text dimColor>No Bash runs in this session yet.</Text>
+      return (
+        <Box flexDirection="column">
+          <Text dimColor>No Bash runs in this session yet.</Text>
+          <Text> </Text>
+          <Text dimColor>Esc: close</Text>
+        </Box>
+      )
     }
 
     const commandColumns = Math.min(COMMAND_COLUMNS, Math.floor(width / 2))
@@ -114,6 +136,8 @@ export const registerBashPane = (on: On): void => {
             </Box>
           )
         })}
+        <Text> </Text>
+        <Text dimColor>{truncateToWidth(LIST_HINT, width)}</Text>
       </Box>
     )
   })

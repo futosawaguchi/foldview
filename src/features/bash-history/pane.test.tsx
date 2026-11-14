@@ -58,6 +58,7 @@ test('一覧はプロンプトで区切り、新しい順に並べる', async ($
   expect(await ui.find({ type: 'Button', key: 't1' })).toBeDefined()
   expect(await ui.find({ type: 'Button', key: 't2' })).toBeDefined()
   expect((await ui.find({ type: 'Text', text: /Tests: 12 passed/ }))?.text).toBe('3 lines · Tests: 12 passed')
+  expect((await ui.find({ type: 'Text', text: /Esc: close/ }))?.text).toContain('Enter: open')
   await ui.unmount()
 })
 
