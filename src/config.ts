@@ -6,18 +6,22 @@ export type Config = {
   readonly enabled: boolean
   /** Bash の出力がこの行数を超えたら折りたたむ */
   readonly bashMaxLines: number
+  /** 標準のまとめ行の下に、Bash の要約やファイル名を足すか */
+  readonly groupDetails: boolean
 }
 
 export const DEFAULT_CONFIG: Config = {
   enabled: true,
   bashMaxLines: 3,
+  groupDetails: true,
 }
 
 /** bashMaxLines として受け付ける上限。大きすぎる値は折りたたみが効かないのと同じになる */
 const MAX_BASH_MAX_LINES = 10_000
 
-export const parseEnabled = (value: unknown): boolean =>
-  typeof value === 'boolean' ? value : DEFAULT_CONFIG.enabled
+const parseBoolean = (value: unknown, fallback: boolean): boolean => (typeof value === 'boolean' ? value : fallback)
+
+export const parseEnabled = (value: unknown): boolean => parseBoolean(value, DEFAULT_CONFIG.enabled)
 
 export const parseBashMaxLines = (value: unknown): number => {
   const number = typeof value === 'string' && value.trim() !== '' ? Number(value) : value
@@ -32,4 +36,5 @@ export const parseBashMaxLines = (value: unknown): number => {
 export const parseConfig = (options: PluginOptions): Config => ({
   enabled: parseEnabled(options['enabled']),
   bashMaxLines: parseBashMaxLines(options['bashMaxLines']),
+  groupDetails: parseBoolean(options['groupDetails'], DEFAULT_CONFIG.groupDetails),
 })

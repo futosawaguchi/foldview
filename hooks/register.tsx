@@ -6,11 +6,13 @@ import { registerBashFold } from '../src/features/bash-fold'
 import { registerBashPane } from '../src/features/bash-history/pane'
 import { registerHistoryRecording } from '../src/features/bash-history/record'
 import { registerCommand } from '../src/features/command'
+import { registerGroupDetails } from '../src/features/group-details'
 
 export const register: Register = (on, options) => {
   const config = parseConfig(options)
 
   registerBashFold(on, config)
+  registerGroupDetails(on, config)
   registerHistoryRecording(on)
   registerBashPane(on)
   registerCommand(on)
