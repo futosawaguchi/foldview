@@ -2,11 +2,19 @@
 
 const ANSI_ESCAPE = /\u001b\[[0-?]*[ -/]*[@-~]|\u001b\][^\u0007\u001b]*(?:\u0007|\u001b\\)/g
 
-export const stripAnsi = (text: string): string => text.replace(ANSI_ESCAPE, '')
+// タブ以外の C0 制御文字、DEL、C1 制御文字（ESC の残りも含む）
+const CONTROL_CHARS = /[\u0000-\u0008\u000b-\u001f\u007f-\u009f]/g
+
+/** 色などのエスケープを取り除き、残った制御文字も消す。タブは空白にする */
+export const stripAnsi = (text: string): string =>
+  text.replace(ANSI_ESCAPE, '').replace(CONTROL_CHARS, '').replace(/\t/g, ' ')
 
 /** 末尾の改行を落としてから行に分ける。空文字列は 0 行。 */
 export const splitLines = (text: string): string[] => {
-  const trimmed = text.replace(/(?:\r?\n)+$/, '')
+  // 正規表現だと改行が多い入力で遅くなるため、末尾から1文字ずつ落とす
+  let end = text.length
+  while (end > 0 && (text[end - 1] === '\n' || text[end - 1] === '\r')) end -= 1
+  const trimmed = text.slice(0, end)
 
   return trimmed === '' ? [] : trimmed.split(/\r?\n/)
 }

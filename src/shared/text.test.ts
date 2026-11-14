@@ -14,6 +14,19 @@ test('stripAnsi は色とリンクのエスケープを取り除く', async () =
   expect(stripAnsi('\u001b]8;;https://x\u0007link\u001b]8;;\u0007')).toBe('link')
 })
 
+test('stripAnsi は残った制御文字も消し、タブは空白にする', async () => {
+  expect(stripAnsi('a\u001bb\u0007c\u009bd')).toBe('abcd')
+  expect(stripAnsi('a\tb')).toBe('a b')
+})
+
+test('splitLines は改行の多い入力でもすぐ終わる', async () => {
+  const many = '\n'.repeat(200_000) + 'x'
+  const started = Date.now()
+
+  expect(splitLines(many).length).toBe(200_001)
+  expect(Date.now() - started).toBeLessThan(1000)
+})
+
 test('displayWidth は全角を2マスと数える', async () => {
   expect(displayWidth('abc')).toBe(3)
   expect(displayWidth('テスト')).toBe(6)
