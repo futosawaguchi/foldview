@@ -1,0 +1,14 @@
+{
+  "name": "foldview",
+  "owner": { "name": "futosawaguchi" },
+  "metadata": {
+    "description": "Claude Code plugins by futosawaguchi."
+  },
+  "plugins": [
+    {
+      "name": "foldview",
+      "source": "./",
+      "description": "Folds long tool output in the Claude Code transcript into one-line summaries."
+    }
+  ]
+}
