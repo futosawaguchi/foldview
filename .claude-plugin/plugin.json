@@ -4,6 +4,7 @@
   "description": "Folds long tool output in the Claude Code transcript into one-line summaries.",
   "author": { "name": "futosawaguchi" },
   "license": "MIT",
+  "types": "./types/index.d.ts",
   "userConfig": {
     "enabled": {
       "type": "boolean",
