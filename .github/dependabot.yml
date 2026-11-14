@@ -1,0 +1,12 @@
+version: 2
+updates:
+  # CI で使う Action の固定（コミット）を、新しい版が出たら更新する
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        patterns: ['*']
+    commit-message:
+      prefix: chore

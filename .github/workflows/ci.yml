@@ -12,20 +12,22 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+# Action はタグを書き換えられても影響を受けないよう、すべてコミットで固定する。
+# 更新は Dependabot（.github/dependabot.yml）が PR を作る。
 jobs:
   plugin:
     name: validate and test
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
-      # 型定義やローカル環境とずらさないため、手元と同じ版に固定する
+      # 結果を安定させるため固定する。作業を始めるときに手元の版と比べ、新しければ上げる
       CLAUDE_CODE_VERSION: 2.1.325
       DISABLE_AUTOUPDATER: '1'
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 22
+          node-version: 24
       - name: Install Claude Code
         run: npm install -g "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}"
       - name: Validate plugin
@@ -42,10 +44,9 @@ jobs:
       pull-requests: read
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
-      # 外部の Action はタグを書き換えられても影響を受けないよう、コミットで固定する
-      - uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2.3.9
+      - uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
