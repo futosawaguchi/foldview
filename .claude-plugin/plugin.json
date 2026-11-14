@@ -1,0 +1,21 @@
+{
+  "name": "foldview",
+  "version": "0.1.0",
+  "description": "Folds long tool output in the Claude Code transcript into one-line summaries.",
+  "author": { "name": "futosawaguchi" },
+  "license": "MIT",
+  "userConfig": {
+    "enabled": {
+      "type": "boolean",
+      "title": "Enabled",
+      "description": "Fold long tool output. /foldview toggles it for the current session.",
+      "default": true
+    },
+    "bashMaxLines": {
+      "type": "number",
+      "title": "Bash max lines",
+      "description": "Bash output longer than this many lines is folded into one line.",
+      "default": 3
+    }
+  }
+}
