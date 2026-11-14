@@ -24,7 +24,7 @@ const field = (input: unknown, key: string): string | undefined => {
 
 const firstLine = (text: string): string => stripAnsi(text.split(/\r?\n/, 1)[0] ?? '').trim()
 
-const baseName = (path: string): string => path.split(/[\\/]/).filter(Boolean).at(-1) ?? path
+const baseName = (path: string): string => firstLine(path.split(/[\\/]/).filter(Boolean).at(-1) ?? path)
 
 /** 名前を並べ、多いときは `+N` で省く。同じ名前は1回だけ出す */
 const listNames = (names: readonly string[]): string => {

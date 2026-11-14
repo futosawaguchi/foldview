@@ -56,6 +56,12 @@ test('名前の行が先、Bash の行があと', async () => {
   expect(buildGroupDetails(calls)).toEqual(['README.md', 'ls · 1 line · x'])
 })
 
+test('ファイル名の制御文字は取り除く', async () => {
+  const calls: GroupCall[] = [{ tool: 'Read', input: { file_path: '/x/\u001b[31mevil\u0007.ts' }, isRunning: false }]
+
+  expect(describeLookups(calls)).toBe('evil.ts')
+})
+
 test('足すものがなければ空', async () => {
   expect(buildGroupDetails([{ tool: 'WebFetch', input: { url: 'https://example.com' }, isRunning: false }])).toEqual([])
 })

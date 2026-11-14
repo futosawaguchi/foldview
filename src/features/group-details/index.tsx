@@ -4,7 +4,7 @@ import { atom, read } from 'claude-code'
 import type { On } from 'claude-code'
 
 import type { Config } from '../../config'
-import { truncateToWidth } from '../../shared/text'
+import { stripAnsi, truncateToWidth } from '../../shared/text'
 import { DEFAULT_OVERRIDE, ENABLED_OVERRIDE_SHAPE, isFoldingEnabled } from '../../state'
 import { buildGroupDetails } from './summary'
 
@@ -38,7 +38,8 @@ export const registerGroupDetails = (on: On, config: Config): void => {
         {details.map((line, index) => (
           <Box key={`detail-${index}`}>
             <Text dimColor>{GUTTER}</Text>
-            <Text dimColor>{truncateToWidth(line, width)}</Text>
+            {/* 部品ごとにも掃除しているが、画面に出す直前にもう一度制御文字を取り除く */}
+            <Text dimColor>{truncateToWidth(stripAnsi(line), width)}</Text>
           </Box>
         ))}
       </Box>
